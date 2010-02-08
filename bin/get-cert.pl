@@ -14,9 +14,9 @@
 
 use Getopt::Std qw(getopts);
 
-use vars qw($opt_d $opt_h $opt_o $opt_p);
+use vars qw($opt_d $opt_h $opt_p);
 
-getopts('d:h:o:p:');
+getopts('d:h:p:');
 
 $opt_d || die "Need option -d directory";
 $opt_h || die "Need option -h hostname";
