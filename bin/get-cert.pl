@@ -1,16 +1,21 @@
 #!/usr/bin/perl -w
 #
-#  Fetch a certificate from an SSL server
+#  Fetch a certificate from an SSL server, save it and show its md5 fingerprint
+#  For use with fetchmail
+#  (C) 2010, Nick Andrew <nick@nick-andrew.net>  Licensed under GPL v3+
 #
 #  Usage: get-cert.pl -d directory -h host [-p port]
 #
 #  Options:
-#    -d directory     Save SSL certificate text in this directory
-#    -h hostname      Host to connect to (also certificate save filename)
+#    -d directory     Save SSL certificate text to a file in this directory
+#    -h hostname      Host to connect to (certificate saved as $hostname.pem))
 #    -p port          Port to connect to on host
 #
-#  Then do:
-#    c_rehash $DIR
+#  After getting the certificate, c_rehash is called to create correct symbolic
+#  links in the certificate directory. The sslfingerprint line is printed and
+#  needs to be put into the .fetchmailrc file.
+
+use strict;
 
 use Getopt::Std qw(getopts);
 
@@ -85,6 +90,10 @@ sub getCertificate {
 	return $cert;
 }
 
+# ---------------------------------------------------------------------------
+# Save an ascii certificate to a file.
+# ---------------------------------------------------------------------------
+
 sub saveCertificate {
 	my ($filename, $data) = @_;
 
@@ -98,11 +107,15 @@ sub saveCertificate {
 	close(OF);
 }
 
+# ---------------------------------------------------------------------------
+# Get the md5 fingerprint of a certificate. Used by fetchmail.
+# ---------------------------------------------------------------------------
+
 sub getFingerprint {
 	my ($filename) = @_;
 
 	if (! open(P, "openssl x509 -in $filename -noout -md5 -fingerprint|")) {
-		die "Unable to open openssl x509 etc on $filename - $!";
+		die "Unable to open pipe to openssl x509 on $filename - $!";
 	}
 
 	my $f;
