@@ -26,14 +26,14 @@ getopts('d:h:p:');
 $opt_d || die "Need option -d directory";
 $opt_h || die "Need option -h hostname";
 
-my $connect = $opt_h . ( $opt_p ? ":$opt_p" : '' );
+my $connect = $opt_h . ($opt_p ? ":$opt_p" : '');
 my $filename = "$opt_d/$opt_h.pem";
 
-if (! -d $opt_d) {
+if (!-d $opt_d) {
 	die "No such directory: $opt_d";
 }
 
-if (! -f $filename) {
+if (!-f $filename) {
 	my $data = getCertificate($connect);
 	saveCertificate($filename, $data);
 	my $rc = system("c_rehash $opt_d");
@@ -60,12 +60,12 @@ exit(0);
 sub getCertificate {
 	my ($connect) = @_;
 
-	if (! open(P, "openssl s_client -connect $connect </dev/null |")) {
+	if (!open(P, "openssl s_client -connect $connect </dev/null |")) {
 		die "Unable to open pipe to openssl to connect to $connect\n";
 	}
 
 	my $in_cert = 0;
-	my $cert = '';
+	my $cert    = '';
 
 	while (<P>) {
 		if (/^-----BEGIN CERTIFICATE-----/) {
@@ -98,7 +98,7 @@ sub saveCertificate {
 	my ($filename, $data) = @_;
 
 	# Write cert to disk
-	if (! open(OF, ">$filename")) {
+	if (!open(OF, ">$filename")) {
 		die "Unable to open $filename for write - $!";
 	}
 
@@ -114,7 +114,7 @@ sub saveCertificate {
 sub getFingerprint {
 	my ($filename) = @_;
 
-	if (! open(P, "openssl x509 -in $filename -noout -md5 -fingerprint|")) {
+	if (!open(P, "openssl x509 -in $filename -noout -md5 -fingerprint|")) {
 		die "Unable to open pipe to openssl x509 on $filename - $!";
 	}
 
